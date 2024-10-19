@@ -5,15 +5,15 @@ from GameRules import *
 def name():
     return 'EnhancedMinimaxAI'
 
-# Evaluation function
+# evaluation function
 def eval(state, player_color):
     opponent_color = 'Dark' if player_color == 'Light' else 'Light'
 
-    # Total number of pieces on the board for each player
+    # total number of pieces on the board
     player_pieces = 0
     opponent_pieces = 0
 
-    # Number of pieces in the middle of the board
+    # number of pieces in the middle of the board
     player_middle_pieces = 0
     opponent_middle_pieces = 0
 
@@ -36,18 +36,18 @@ def eval(state, player_color):
     player_captured = state['LightCapture'] if player_color == 'Light' else state['DarkCapture']
     opponent_captured = state['LightCapture'] if opponent_color == 'Light' else state['DarkCapture']
 
-    # Check if it's early game or not
+    # check if it's early game or not
     total_captured_pieces = player_captured + opponent_captured
 
     if total_captured_pieces < 10:
-        # Early game: prioritize middle control
+        # early game, prioritize middle control
         eval_value = (
             (player_pieces + player_captured)
             - (opponent_pieces + opponent_captured)
             + 2 * (player_middle_pieces - opponent_middle_pieces)
         )
     else:
-        # Later game: prioritize total pieces and captures
+        # later game, prioritize total pieces and captures
         eval_value = (
             (player_pieces + 2 * player_captured)
             - (opponent_pieces + 2 * opponent_captured)
@@ -55,14 +55,14 @@ def eval(state, player_color):
 
     return eval_value
 
-# Minimax function with alpha-beta pruning
+# MiniMax function with alpha-beta pruning
 def minimax(state, depth, alpha, beta, maximizingPlayer, player_color):
     if depth == 0 or isGameOver(state):
         return eval(state, player_color), None
 
     legal_moves = getAllLegalMoves(state)
     if not legal_moves:
-        # No legal moves, game over
+        # no legal moves, game over
         return eval(state, player_color), None
 
     if maximizingPlayer:
@@ -101,18 +101,18 @@ def getMove(state):
     player_color = state['Turn']
     opponent_color = 'Dark' if player_color == 'Light' else 'Light'
 
-    # Depth for the minimax algorithm
+    # depth for the minimax algorithm
     depth = 3  # Adjust the depth as needed for performance
 
     # Call minimax to get the best move
     eval_value, best_move = minimax(state, depth, float('-inf'), float('inf'), True, player_color)
 
     if best_move:
-        print(f"ENHANCED MINIMAX AI SELECTED MOVE: {best_move}")
+        print(f"MINIMAX AI SELECTED MOVE: {best_move}")
         return best_move
 
     # Fallback to random move if no best move found
     legal_moves = getAllLegalMoves(state)
     move = random.choice(legal_moves)
-    print(f"ENHANCED MINIMAX AI SELECTED RANDOM MOVE: {move}")
+    print(f"MINIMAX AI SELECTED RANDOM MOVE: {move}")
     return move

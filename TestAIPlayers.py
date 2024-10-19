@@ -12,7 +12,7 @@ import sys
 # to ensure that each process has its own copy
 # This avoids issues with shared state across processes
 
-from parametersets import parameter_sets  # Import parameter sets
+from parametersets import new_parameter_sets as parameter_sets  # Import parameter sets
 
 # List of AI player modules
 ai_players = [

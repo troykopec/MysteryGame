@@ -1,0 +1,74 @@
+Parameters: {'eval_weights': {'pieces': 1.0, 'captured': 1.0, 'middle_pieces': 3.0, 'largest_stack_penalty': 0.2, 'potential_captures': 1.0, 'mobility': 1.0, 'largest_stack_bonus': 1.0}, 'depths': {'early': 3, 'mid': 3, 'late': 6}, 'time_limits': {'early': 5, 'mid': 10, 'late': 15}, 'thresholds': {'early_captured_pieces': 10, 'mid_captured_pieces': 30, 'average_stack_size': 1.5, 'large_stacks': 3}}
+Wins: 23, Losses: 14, Draws: 3
+Win Rate: 57.50%
+--------------------------------------------------
+
+Parameters: {'eval_weights': {'pieces': 1.0, 'captured': 1.5, 'middle_pieces': 3.0, 'largest_stack_penalty': 0.2, 'potential_captures': 1.5, 'mobility': 1.0, 'largest_stack_bonus': 1.0}}
+Wins: 29, Losses: 11, Draws: 0
+Win Rate: 72.50%
+--------------------------------------------------
+
+Parameters: {'eval_weights': {'pieces': 1.0, 'captured': 1.0, 'middle_pieces': 3.0, 'largest_stack_penalty': 0.2, 'potential_captures': 1.0, 'mobility': 1.5, 'largest_stack_bonus': 1.0}}
+Wins: 29, Losses: 9, Draws: 2
+Win Rate: 72.50%
+--------------------------------------------------
+
+Parameters: {'eval_weights': {'pieces': 1.0, 'captured': 1.0, 'middle_pieces': 2.0, 'largest_stack_penalty': 0.2, 'potential_captures': 1.0, 'mobility': 1.0, 'largest_stack_bonus': 1.0}}
+Wins: 27, Losses: 11, Draws: 2
+Win Rate: 67.50%
+--------------------------------------------------
+
+Parameters: {'eval_weights': {'pieces': 1.0, 'captured': 1.0, 'middle_pieces': 3.0, 'largest_stack_penalty': 0.5, 'potential_captures': 1.0, 'mobility': 1.0, 'largest_stack_bonus': 1.0}}
+Wins: 30, Losses: 9, Draws: 1
+Win Rate: 75.00%
+--------------------------------------------------
+
+Parameters: {'eval_weights': {'pieces': 1.0, 'captured': 1.0, 'middle_pieces': 3.0, 'largest_stack_penalty': 0.2, 'potential_captures': 1.0, 'mobility': 1.0, 'largest_stack_bonus': 2.0}}
+Wins: 30, Losses: 9, Draws: 1
+Win Rate: 75.00%
+--------------------------------------------------
+
+Parameters: {'depths': {'early': 4, 'mid': 3, 'late': 6}}
+Wins: 27, Losses: 10, Draws: 3
+Win Rate: 67.50%
+--------------------------------------------------
+
+Parameters: {'time_limits': {'early': 3, 'mid': 5, 'late': 10}}
+Wins: 29, Losses: 11, Draws: 0
+Win Rate: 72.50%
+--------------------------------------------------
+
+Parameters: {'thresholds': {'early_captured_pieces': 5, 'mid_captured_pieces': 20, 'average_stack_size': 1.5, 'large_stacks': 2}}
+Wins: 31, Losses: 9, Draws: 0
+Win Rate: 77.50%
+--------------------------------------------------
+
+Parameters: {'eval_weights': {'pieces': 1.0, 'captured': 2.0, 'middle_pieces': 3.0, 'largest_stack_penalty': 0.2, 'potential_captures': 2.0, 'mobility': 2.0, 'largest_stack_bonus': 1.0}}
+Wins: 32, Losses: 6, Draws: 2
+Win Rate: 80.00%
+--------------------------------------------------
+
+Parameters: {'eval_weights': {'pieces': 1.5, 'captured': 1.0, 'middle_pieces': 3.0, 'largest_stack_penalty': 0.2, 'potential_captures': 1.0, 'mobility': 1.0, 'largest_stack_bonus': 1.0}}
+Wins: 28, Losses: 12, Draws: 0
+Win Rate: 70.00%
+--------------------------------------------------
+
+Parameters: {'eval_weights': {'pieces': 0.5, 'captured': 1.0, 'middle_pieces': 3.0, 'largest_stack_penalty': 0.2, 'potential_captures': 1.0, 'mobility': 1.0, 'largest_stack_bonus': 1.0}}
+Wins: 20, Losses: 17, Draws: 3
+Win Rate: 50.00%
+--------------------------------------------------
+
+Parameters: {'eval_weights': {'pieces': 1.0, 'captured': 1.0, 'middle_pieces': 1.0, 'largest_stack_penalty': 0.2, 'potential_captures': 1.0, 'mobility': 1.0, 'largest_stack_bonus': 1.0}}
+Wins: 22, Losses: 13, Draws: 5
+Win Rate: 55.00%
+--------------------------------------------------
+
+Parameters: {'depths': {'early': 4, 'mid': 4, 'late': 7}}
+Wins: 28, Losses: 10, Draws: 2
+Win Rate: 70.00%
+--------------------------------------------------
+
+Parameters: {'eval_weights': {'pieces': 1.0, 'captured': 1.0, 'middle_pieces': 3.0, 'largest_stack_penalty': 0.2, 'potential_captures': 2.0, 'mobility': 1.0, 'largest_stack_bonus': 1.0}}
+Wins: 28, Losses: 12, Draws: 0
+Win Rate: 70.00%
+--------------------------------------------------

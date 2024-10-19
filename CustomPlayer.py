@@ -6,14 +6,15 @@ import time
 def name():
     return 'StrategicMinimaxAI'
 
-# Parameters to optimize
+
+# parameter set 10 from first run thru, won %80 of time
 EVAL_WEIGHTS = {
     'pieces': 1.0,
-    'captured': 1.0,
+    'captured': 2.0,  # Highly prioritize captures
     'middle_pieces': 3.0,
     'largest_stack_penalty': 0.2,
-    'potential_captures': 1.0,
-    'mobility': 1.0,
+    'potential_captures': 2.0,  # Increase potential captures weight
+    'mobility': 2.0,  # Highly prioritize mobility
     'largest_stack_bonus': 1.0,
 }
 
@@ -36,7 +37,7 @@ GAME_STAGE_THRESHOLDS = {
     'large_stacks': 3,
 }
 
-# Function to set parameters from outside
+# function to set parameters from outside, helper for testAIplayers (not nessecary for playing regular games)
 def set_parameters(eval_weights=None, depths=None, time_limits=None, thresholds=None):
     global EVAL_WEIGHTS, DEPTHS, TIME_LIMITS, GAME_STAGE_THRESHOLDS
     if eval_weights is not None:
@@ -48,19 +49,19 @@ def set_parameters(eval_weights=None, depths=None, time_limits=None, thresholds=
     if thresholds is not None:
         GAME_STAGE_THRESHOLDS.update(thresholds)
 
-# Evaluation function
+# evaluation function
 def eval(state, player_color, game_stage):
     opponent_color = 'Dark' if player_color == 'Light' else 'Light'
 
-    # Total number of pieces on the board for each player
+    # total number of pieces on the board
     player_pieces = 0
     opponent_pieces = 0
 
-    # Number of pieces in the middle of the board
+    # number of pieces in the middle of the board
     player_middle_pieces = 0
     opponent_middle_pieces = 0
 
-    # Mobility: number of legal moves
+    # mobility (number of legal moves)
     player_mobility = len(getAllLegalMoves(state)) if state['Turn'] == player_color else 0
     opponent_state = copyState(state)
     opponent_state['Turn'] = opponent_color
@@ -69,7 +70,7 @@ def eval(state, player_color, game_stage):
     middle_rows = [2, 3]
     middle_cols = [2, 3]
 
-    # Largest stack sizes
+    # largest stack size
     player_largest_stack = 0
     opponent_largest_stack = 0
 
@@ -93,12 +94,11 @@ def eval(state, player_color, game_stage):
     player_captured = state['LightCapture'] if player_color == 'Light' else state['DarkCapture']
     opponent_captured = state['LightCapture'] if opponent_color == 'Light' else state['DarkCapture']
 
-    # Use weights from EVAL_WEIGHTS
+    # use weights from EVAL_WEIGHTS
     weights = EVAL_WEIGHTS
 
-    # Evaluation based on game stage
+    # parameter evaluation based on game stage
     if game_stage == 'early':
-        # Early game: prioritize middle control and reasonable stack sizes
         eval_value = (
             weights['pieces'] * (player_pieces + player_captured - opponent_pieces - opponent_captured)
             + weights['middle_pieces'] * (player_middle_pieces - opponent_middle_pieces)
@@ -106,13 +106,11 @@ def eval(state, player_color, game_stage):
             + weights['potential_captures'] * potential_capture_score(state, player_color)
         )
     elif game_stage == 'mid':
-        # Mid game: prioritize captures and mobility
         eval_value = (
             weights['pieces'] * (player_pieces + 2 * player_captured - opponent_pieces - 2 * opponent_captured)
             + weights['mobility'] * (player_mobility - opponent_mobility)
         )
     else:
-        # Late game: maximize number of moves and prepare for endgame bonus
         eval_value = (
             weights['pieces'] * (player_pieces + 3 * player_captured - opponent_pieces - 3 * opponent_captured)
             + weights['mobility'] * (player_mobility - opponent_mobility) * 2
@@ -121,6 +119,7 @@ def eval(state, player_color, game_stage):
 
     return eval_value
 
+# calculate potential capture score
 def potential_capture_score(state, player_color):
     score = 0
     legal_moves = getAllLegalMoves(state)
@@ -129,6 +128,7 @@ def potential_capture_score(state, player_color):
             score += 1
     return score
 
+#moves that lead to capturing
 def move_leads_to_capture(state, move, player_color):
     new_state = playMove(state, move)
     if new_state:
@@ -139,45 +139,42 @@ def move_leads_to_capture(state, move, player_color):
                 return True
     return False
 
-# Enhanced game stage determination
+# game stage determination
 def get_game_stage(state):
     thresholds = GAME_STAGE_THRESHOLDS
     total_captured_pieces = state['LightCapture'] + state['DarkCapture']
     total_pieces_on_board = sum(state['Board'])
-    total_pieces_initial = 36  # Initial total pieces on the board
+    total_pieces_initial = 36  # initial total pieces on the board
 
-    # Mobility
+    # mobility
     player_mobility = len(getAllLegalMoves(state))
     opponent_state = copyState(state)
     opponent_state['Turn'] = 'Dark' if state['Turn'] == 'Light' else 'Light'
     opponent_mobility = len(getAllLegalMoves(opponent_state))
 
-    # Calculate average stack size
+    # calculate average stack size
     num_non_empty_squares = sum(1 for piece in state['Board'] if piece > 0)
     average_stack_size = total_pieces_on_board / num_non_empty_squares if num_non_empty_squares > 0 else 0
 
-    # Determine if large stacks exist
+    # determine if large stacks exist
     large_stacks = sum(1 for piece in state['Board'] if piece >= 4)
 
-    # Early game: high mobility, low average stack size, few large stacks
     if (total_captured_pieces < thresholds['early_captured_pieces'] and
         average_stack_size <= thresholds['average_stack_size'] and
         large_stacks < thresholds['large_stacks']):
         return 'early'
-    # Mid game: moderate mobility, increasing average stack size
     elif (thresholds['early_captured_pieces'] <= total_captured_pieces < thresholds['mid_captured_pieces'] or
           average_stack_size <= 3):
         return 'mid'
     else:
-        # Late game: low mobility, high average stack size, presence of large stacks
         return 'late'
 
 def is_initial_state(state):
-    # Check if the board is in its initial configuration
+    # check if the board is in its initial configuration
     return sum(state['Board']) == 36 and state['LightCapture'] == 0 and state['DarkCapture'] == 0
 
 def select_opening_move(state):
-    # Define a list of strong opening moves
+    # list of strong opening moves
     possible_openings = [
         {'Row': 2, 'Col': 2, 'Direction': 'SE'},
         {'Row': 2, 'Col': 3, 'Direction': 'SW'},
@@ -190,9 +187,9 @@ def select_opening_move(state):
             return move
     return None
 
-# Minimax function with alpha-beta pruning and dynamic depth in late game
+# minimax function with alpha-beta pruning and dynamic depth in late game
 def minimax(state, depth, alpha, beta, maximizingPlayer, player_color, game_stage, start_time, time_limit):
-    # Time check to avoid exceeding time limit
+    # time check to avoid exceeding time limit
     if time.time() - start_time > time_limit:
         return eval(state, player_color, game_stage), None
 
@@ -201,7 +198,7 @@ def minimax(state, depth, alpha, beta, maximizingPlayer, player_color, game_stag
 
     legal_moves = getAllLegalMoves(state)
     if not legal_moves:
-        # No legal moves, game over
+        # no legal moves, game over
         return eval(state, player_color, game_stage), None
 
     if maximizingPlayer:
@@ -240,24 +237,24 @@ def getMove(state):
     player_color = state['Turn']
     opponent_color = 'Dark' if player_color == 'Light' else 'Light'
 
-    # Determine game stage
+    # determine game stage
     game_stage = get_game_stage(state)
 
-    # Adjust depth and time limit based on game stage
+    # adjust depth and time limit based on game stage
     depth = DEPTHS.get(game_stage, 3)
     time_limit = TIME_LIMITS.get(game_stage, 5)
 
     start_time = time.time()
     best_move = None
 
-    # Opening move heuristics
+    # opening move heuristics
     if game_stage == 'early' and is_initial_state(state):
         move = select_opening_move(state)
         if move:
             print(f"STRATEGIC MINIMAX AI SELECTED OPENING MOVE: {move}")
             return move
 
-    # Iterative deepening in late game
+    # iterative deepening in late game
     if game_stage == 'late':
         for d in range(1, depth + 1):
             eval_value, move = minimax(state, d, float('-inf'), float('inf'), True, player_color, game_stage, start_time, time_limit)
@@ -266,14 +263,14 @@ def getMove(state):
             if move is not None:
                 best_move = move
     else:
-        # Regular minimax search
+        # regular minimax search
         eval_value, best_move = minimax(state, depth, float('-inf'), float('inf'), True, player_color, game_stage, start_time, time_limit)
 
     if best_move:
         print(f"STRATEGIC MINIMAX AI ({game_stage.upper()} STAGE) SELECTED MOVE: {best_move}")
         return best_move
 
-    # Fallback to random move if no best move found
+    # fallback to random move if no best move found
     legal_moves = getAllLegalMoves(state)
     move = random.choice(legal_moves)
     print(f"STRATEGIC MINIMAX AI SELECTED RANDOM MOVE: {move}")
