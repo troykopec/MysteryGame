@@ -1,60 +1,118 @@
 import random
 from GameRules import *
 
-
 # AI name
 def name():
-    return 'LookAheadAI'
+    return 'EnhancedMinimaxAI'
 
-# Recursive function to generate the tree and count nodes
-def lookAhead(state, depth=1):
+# Evaluation function
+def eval(state, player_color):
+    opponent_color = 'Dark' if player_color == 'Light' else 'Light'
+
+    # Total number of pieces on the board for each player
+    player_pieces = 0
+    opponent_pieces = 0
+
+    # Number of pieces in the middle of the board
+    player_middle_pieces = 0
+    opponent_middle_pieces = 0
+
+    middle_rows = [2, 3]
+    middle_cols = [2, 3]
+
+    for i in range(6):
+        for j in range(6):
+            pieces = getPieces(state['Board'], i, j)
+            square_color = color(i, j)
+            if square_color == player_color:
+                player_pieces += pieces
+                if i in middle_rows and j in middle_cols:
+                    player_middle_pieces += pieces
+            else:
+                opponent_pieces += pieces
+                if i in middle_rows and j in middle_cols:
+                    opponent_middle_pieces += pieces
+
+    player_captured = state['LightCapture'] if player_color == 'Light' else state['DarkCapture']
+    opponent_captured = state['LightCapture'] if opponent_color == 'Light' else state['DarkCapture']
+
+    # Check if it's early game or not
+    total_captured_pieces = player_captured + opponent_captured
+
+    if total_captured_pieces < 10:
+        # Early game: prioritize middle control
+        eval_value = (
+            (player_pieces + player_captured)
+            - (opponent_pieces + opponent_captured)
+            + 2 * (player_middle_pieces - opponent_middle_pieces)
+        )
+    else:
+        # Later game: prioritize total pieces and captures
+        eval_value = (
+            (player_pieces + 2 * player_captured)
+            - (opponent_pieces + 2 * opponent_captured)
+        )
+
+    return eval_value
+
+# Minimax function with alpha-beta pruning
+def minimax(state, depth, alpha, beta, maximizingPlayer, player_color):
     if depth == 0 or isGameOver(state):
-        return state, 1
+        return eval(state, player_color), None
 
     legal_moves = getAllLegalMoves(state)
-    total_nodes = 1  # Current state is one node
+    if not legal_moves:
+        # No legal moves, game over
+        return eval(state, player_color), None
 
-    best_move = None
-    best_state = None
-    max_captures = -1
-
-    for move in legal_moves:
-        new_state = playMove(state, move)
-        if new_state is None:
-            continue
-        
-        # Recursively look ahead
-        _, nodes = lookAhead(new_state, depth - 1)
-        total_nodes += nodes
-
-        # Evaluate based on captures
-        captures = new_state['LightCapture'] if new_state['Turn'] == 'Dark' else new_state['DarkCapture']
-
-        if captures > max_captures:
-            max_captures = captures
-            best_move = move
-            best_state = new_state
-
-    return best_state, total_nodes
+    if maximizingPlayer:
+        maxEval = float('-inf')
+        best_move = None
+        for move in legal_moves:
+            new_state = playMove(state, move)
+            if new_state is None:
+                continue
+            eval_value, _ = minimax(new_state, depth - 1, alpha, beta, False, player_color)
+            if eval_value > maxEval:
+                maxEval = eval_value
+                best_move = move
+            alpha = max(alpha, eval_value)
+            if beta <= alpha:
+                break
+        return maxEval, best_move
+    else:
+        minEval = float('inf')
+        best_move = None
+        for move in legal_moves:
+            new_state = playMove(state, move)
+            if new_state is None:
+                continue
+            eval_value, _ = minimax(new_state, depth - 1, alpha, beta, True, player_color)
+            if eval_value < minEval:
+                minEval = eval_value
+                best_move = move
+            beta = min(beta, eval_value)
+            if beta <= alpha:
+                break
+        return minEval, best_move
 
 # AI function to select the best move
 def getMove(state):
-    # Look ahead by one move (depth=1)
-    best_state, total_nodes = lookAhead(state, depth=3)
+    player_color = state['Turn']
+    opponent_color = 'Dark' if player_color == 'Light' else 'Light'
 
-    # Print the total number of nodes in the tree
-    print(f"Total nodes in the move tree: {total_nodes}")
+    # Depth for the minimax algorithm
+    depth = 3  # Adjust the depth as needed for performance
 
-    if best_state:
-        legal_moves = getAllLegalMoves(state)
-        for move in legal_moves:
-            # Compare the state after each legal move and return the matching one
-            if playMove(state, move) == best_state:
-                print(f"LOOK AHEAD AI TAKING: {move['Direction']}")
-                return move
+    # Call minimax to get the best move
+    eval_value, best_move = minimax(state, depth, float('-inf'), float('inf'), True, player_color)
+
+    if best_move:
+        print(f"ENHANCED MINIMAX AI SELECTED MOVE: {best_move}")
+        return best_move
 
     # Fallback to random move if no best move found
     legal_moves = getAllLegalMoves(state)
     move = random.choice(legal_moves)
-    print(f"LOOK AHEAD AI TAKING: {move['Direction']}")
+    print(f"ENHANCED MINIMAX AI SELECTED RANDOM MOVE: {move}")
     return move

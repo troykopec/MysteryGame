@@ -19,6 +19,7 @@
 import importlib
 import sys
 import GameRules
+import os 
 
 # Load the code for the AI players
 # Use command line arguments
@@ -35,10 +36,18 @@ else:
     players['Dark'] = importlib.import_module('DefaultPlayer')
 
     
-if ( len(sys.argv) > 3):
-    log_name = 'game' + sys.argv[3] + '.py'
+# Specify the folder where you want to save the log files
+log_folder = 'logs'  # Change this to your desired folder path
+
+# Ensure the folder exists
+if not os.path.exists(log_folder):
+    os.makedirs(log_folder)
+
+# Modify the log_name to save in the specified folder
+if len(sys.argv) > 3:
+    log_name = os.path.join(log_folder, f'game{sys.argv[3]}.log')
 else:
-    log_name = 'game0.log'
+    log_name = os.path.join(log_folder, 'game0.log')
 
 # Create a gameID for use in the log file
 # Use the 3rd command line argument
